@@ -310,3 +310,20 @@ A few outliers around ±0.2
 * XGBoost shows excellent fit across full range of wear.
 * Controlled data helps mitigate overfitting.
 * Ready for deployment with UI + Flask API.
+
+### Setup
+
+   - cd inlet_valve_wear_modelling # move to folder
+   - python3 -m venv .env_base # create virtual environment if it doesn't exist
+   - source .env_base/bin/activate  # activate the virtual environment
+   - pip install -r requirements.txt # install all the supported libraries
+   
+   * To run the application:
+        - python app.py # will run the app in the localhost server
+        - Access and start providing the user inputs to start the simulations
+
+   * To create a synthetic data:
+        -   python synthetic_data.py
+
+    * To train the algo on synthetic data:
+        - python train.py
