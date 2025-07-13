@@ -312,7 +312,7 @@ A few outliers around ±0.2
 * Ready for deployment with UI + Flask API.
 
 ### Setup
-
+```
    - cd inlet_valve_wear_modelling # move to folder
    - python3 -m venv .env_base # create virtual environment if it doesn't exist
    - source .env_base/bin/activate  # activate the virtual environment
@@ -327,3 +327,4 @@ A few outliers around ±0.2
 
     * To train the algo on synthetic data:
         - python train.py
+```
