@@ -31,7 +31,7 @@
 | High Lubrication Index  | Low                 | Lower friction prevents material loss.       |
 | High Mismatch Angle     | High                | Stress concentration causes localized wear.  |
 
-## 🔁 Updated Pseudo Algorithm (from Final Synthetic Data Code)
+## 🔁 Pseudo Algorithm 
 
 ### 📌 Step-by-Step Logic:
 
@@ -77,7 +77,7 @@
      ```
    * Clamp wear between 0.1 and 3.0
 
-## 🧠 Reasoning Behind Equations (From Uploaded Document)
+## 🧠 Reasoning Behind Equations
 
 ### 1. Temperature Equation
 ```math
@@ -108,7 +108,6 @@ wear = \frac{P \cdot V \cdot t \cdot T_{mult} \cdot Material_{mod} \cdot (1 + mi
 * **Material and Coating Influence**: Applied via modifiers and hardness lookup.
 * **Lubrication Impact**: Modeled inversely via `coeff_mod` to reduce wear.
 
-The equations preserve physical meaning while allowing controlled data synthesis. Refer to Equation (1) and (2) in the uploaded reasoning PDF for further context.
 
 ## 📊 Correlation Audit
 
