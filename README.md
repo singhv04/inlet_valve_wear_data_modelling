@@ -123,6 +123,81 @@ The equations preserve physical meaning while allowing controlled data synthesis
 
 ## 📘 ML Model Summary
 
+# 🤖 Why XGBoost Was Used for Inlet Valve Wear Prediction
+
+## ✅ Motivation
+
+Predicting wear involves:
+
+* Complex, **non-linear relationships** between inputs (pressure × velocity × time × temp)
+* Combination of **numerical** and **categorical** variables (e.g., coatings, materials)
+* Potential **noise and outliers** in synthetic or real data
+* Need for **accurate, interpretable**, and **fast** model
+
+➡️ **XGBoost** is designed to handle exactly these kinds of problems.
+
+---
+
+## 🌳 What is XGBoost?
+
+**XGBoost** (Extreme Gradient Boosting) is an optimized machine learning algorithm based on **gradient-boosted decision trees**.
+
+It builds a **sequence of shallow trees**, each trying to correct the **residual errors** of the previous ones.
+
+### 📐 Layman Analogy
+Imagine you're trying to predict wear with a very basic model, and it's making mistakes. XGBoost says:
+"Okay, let me see what you're getting wrong. I’ll build a new tree that only focuses on correcting those mistakes."
+It does this over and over, until your predictions become incredibly accurate.
+
+### 🧠 Basic Concept:
+
+> Predict, look at errors → fit next model to correct those errors → repeat
+
+---
+
+## 🔢 Mathematical Overview
+
+### Step 1: Residuals
+
+Compute error:
+$r_i = y_i - \hat{y}_i$
+
+### Step 2: New Tree Learns the Residuals
+
+A new tree $f_t(x)$ is trained on $r_i$ to minimize the loss.
+
+### Step 3: Prediction Update
+
+$\hat{y}_i^{(t)} = \hat{y}_i^{(t-1)} + \eta f_t(x_i)$
+Where:
+
+* $\eta$ = learning rate (controls how aggressively updates are made)
+
+### Step 4: Regularized Loss
+
+To prevent overfitting:
+$\mathcal{L}(\Theta) = \sum (y_i - \hat{y}_i)^2 + \lambda \sum_j w_j^2$
+Where:
+
+* $w_j$: leaf weights
+* $\lambda$: regularization parameter
+
+---
+
+## ⚖️ Why It Makes Sense for This Use Case
+
+| Property                | Why XGBoost Works Well                                           |
+| ----------------------- | ---------------------------------------------------------------- |
+| Non-linear dependencies | Captures complex interactions (e.g., pressure × velocity × time) |
+| Mixed-type features     | Handles numeric + categorical via tree splits                    |
+| Noise tolerance         | Trees are less sensitive to outliers                             |
+| Regularization          | Avoids overfitting in synthetic data                             |
+| Interpretability        | Can extract feature importance, SHAP, etc.                       |
+| Efficiency              | Extremely fast, optimized C++ backend                            |
+
+---
+
+
 | Metric | Meaning                        | Why We Use It             |
 |--------|--------------------------------|---------------------------|
 | R²     | Variance explained             | Overall model strength    |
