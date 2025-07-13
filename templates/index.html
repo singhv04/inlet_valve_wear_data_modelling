@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inlet Valve Wear Model</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f7f7f7; }
+    .container { max-width: 1000px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; }
+    h2 { margin-bottom: 10px; }
+    .form-row { display: flex; flex-wrap: wrap; margin-bottom: 15px; }
+    .form-group { flex: 1 1 45%; margin: 10px; position: relative; }
+    label { font-weight: bold; display: block; margin-bottom: 5px; }
+    .info-icon { cursor: help; margin-left: 5px; color: #007bff; font-weight: normal; }
+    input, select { width: 100%; padding: 8px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; }
+    .button-group { text-align: center; margin-top: 20px; }
+    button { padding: 10px 20px; font-size: 1rem; border: none; border-radius: 5px; background: #007bff; color: white; cursor: pointer; }
+    #documentation { position: fixed; top: 20px; right: 20px; }
+    #docModal { display: none; position: fixed; top: 10%; left: 10%; width: 80%; height: 80%; background: #fff; border: 2px solid #007bff; border-radius: 10px; padding: 20px; overflow-y: auto; z-index: 1000; }
+    #docModal pre { white-space: pre-wrap; word-wrap: break-word; }
+    #docModalClose { position: absolute; top: 10px; right: 20px; font-size: 20px; cursor: pointer; }
+    .error { color: red; font-size: 0.9rem; display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Inlet Valve Wear Model - User Input</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>N (cycles) <span class="info-icon" title="Total number of valve operation cycles">i</span></label>
+        <input type="number" id="N" placeholder="e.g. 18720000">
+        <div class="error" id="err_N">Enter valid N > 0</div>
+      </div>
+      <div class="form-group">
+        <label>RPM <span class="info-icon" title="Revolutions per minute">i</span></label>
+        <input type="number" id="rpm" placeholder="e.g. 4800">
+        <div class="error" id="err_rpm">Enter valid RPM > 0</div>
+      </div>
+      <div class="form-group">
+        <label>Pressure (Pa) <span class="info-icon" title="Peak pressure applied on the valve seat">i</span></label>
+        <input type="number" id="pressure" placeholder="1e6 - 1.3e7">
+        <div class="error" id="err_pressure">Enter pressure between 1e6 and 1.3e7</div>
+      </div>
+      <div class="form-group">
+        <label>Valve Material <span class="info-icon" title="Material of the valve">i</span></label>
+        <select id="valve_material">
+          <option value="EMS200">EMS200</option>
+          <option value="X45CrSi9-3">X45CrSi9-3</option>
+          <option value="21-4N">21-4N</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Seat Insert Material <span class="info-icon" title="Material of the seat insert">i</span></label>
+        <select id="insert_material">
+          <option value="Ni-resist">Ni-resist</option>
+          <option value="Stellite">Stellite</option>
+          <option value="Inconel">Inconel</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Coating <span class="info-icon" title="Type of surface coating applied">i</span></label>
+        <select id="coating">
+          <option value="None">None</option>
+          <option value="Chromium Nitride">Chromium Nitride</option>
+          <option value="Titanium Nitride">Titanium Nitride</option>
+          <option value="Thermal Spray">Thermal Spray</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Diameter (mm) <span class="info-icon" title="Diameter of the valve">i</span></label>
+        <input type="number" id="diameter" placeholder="35 - 55">
+        <div class="error" id="err_diameter">Enter diameter between 35 and 55</div>
+      </div>
+      <div class="form-group">
+        <label>Lubrication Index <span class="info-icon" title="Lubrication effectiveness (0.5 - 1.0)">i</span></label>
+        <input type="number" id="lubrication_index" step="0.01" placeholder="e.g. 0.8">
+        <div class="error" id="err_lubrication_index">Enter lubrication index between 0.5 and 1.0</div>
+      </div>
+      <div class="form-group">
+        <label>Seat Angle (°) <span class="info-icon" title="Angle of the valve seat">i</span></label>
+        <input type="number" id="seat_angle" placeholder="e.g. 30">
+      </div>
+      <div class="form-group">
+        <label>Insert Angle (°) <span class="info-icon" title="Angle of the insert seat">i</span></label>
+        <input type="number" id="insert_angle" placeholder="e.g. 31">
+      </div>
+      <div class="form-group">
+        <label>Duration (s) <span class="info-icon" title="Total exposure duration under load">i</span></label>
+        <input type="number" id="duration" placeholder="e.g. 200 - 3000">
+        <div class="error" id="err_duration">Enter duration between 200 and 3000</div>
+      </div>
+      <div class="form-group">
+        <label>Face Width (mm) <span class="info-icon" title="Contact width of valve face">i</span></label>
+        <input type="number" id="face_width" placeholder="1.5 - 4.0">
+        <div class="error" id="err_face_width">Enter face width between 1.5 and 4.0</div>
+      </div>
+
+      <!-- Newly added required fields -->
+      <div class="form-group">
+        <label>Temperature (°C) <span class="info-icon" title="Average valve temperature during operation">i</span></label>
+        <input type="number" id="temperature" placeholder="300 - 800">
+        <div class="error" id="err_temperature">Enter temperature between 300 and 800</div>
+      </div>
+      <div class="form-group">
+        <label>Hardness (HV) <span class="info-icon" title="Vickers hardness of valve seat material">i</span></label>
+        <input type="number" id="hardness" placeholder="150 - 400">
+        <div class="error" id="err_hardness">Enter hardness between 150 and 400</div>
+      </div>
+      <div class="form-group">
+        <label>Velocity (m/s) <span class="info-icon" title="Impact velocity of valve on seat">i</span></label>
+        <input type="number" id="velocity" placeholder="1 - 5">
+        <div class="error" id="err_velocity">Enter velocity between 1 and 5</div>
+      </div>
+      <div class="form-group">
+        <label>Coefficient Modifier <span class="info-icon" title="Material-dependent coefficient for wear estimation">i</span></label>
+        <input type="number" id="coeff_mod" step="0.01" placeholder="e.g. 0.9">
+        <div class="error" id="err_coeff_mod">Enter coefficient modifier between 0.5 and 1.2</div>
+      </div>
+      <div class="form-group">
+        <label>Mismatch (mm) <span class="info-icon" title="Radial misalignment between valve and seat">i</span></label>
+        <input type="number" id="mismatch" step="0.01" placeholder="0.0 - 1.0">
+        <div class="error" id="err_mismatch">Enter mismatch between 0 and 1</div>
+      </div>
+    </div>
+    <div class="button-group">
+      <button onclick="submitInput()">Submit</button>
+    </div>
+  </div>
+
+  <div id="documentation">
+    <button onclick="showDocumentation()">📘 View Documentation</button>
+  </div>
+
+  <div id="docModal">
+    <span id="docModalClose" onclick="hideDocumentation()">❌</span>
+    <h3>Documentation</h3>
+    <pre id="docContent">
+Loading model description and variable definitions...
+    </pre>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    function showDocumentation() {
+      document.getElementById('docModal').style.display = 'block';
+      fetch('/docs')
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById('docContent').innerHTML = marked.parse(data);
+        })
+        .catch(err => {
+          document.getElementById('docContent').innerText = 'Failed to load documentation.';
+        });
+    }
+
+    function hideDocumentation() {
+      document.getElementById('docModal').style.display = 'none';
+    }
+
+    function validateInput(id, condition, errorId) {
+      const input = document.getElementById(id);
+      const error = document.getElementById(errorId);
+      if (!condition(input.value)) {
+        error.style.display = 'block';
+        return false;
+      } else {
+        error.style.display = 'none';
+        return true;
+      }
+    }
+
+    function submitInput() {
+      const valid = [
+        validateInput('N', v => v > 0, 'err_N'),
+        validateInput('rpm', v => v > 0, 'err_rpm'),
+        validateInput('pressure', v => v >= 1e6 && v <= 1.3e7, 'err_pressure'),
+        validateInput('diameter', v => v >= 35 && v <= 55, 'err_diameter'),
+        validateInput('lubrication_index', v => v >= 0.5 && v <= 1.0, 'err_lubrication_index'),
+        validateInput('duration', v => v >= 200 && v <= 3000, 'err_duration'),
+        validateInput('face_width', v => v >= 1.5 && v <= 4.0, 'err_face_width'),
+        validateInput('temperature', v => v >= 300 && v <= 800, 'err_temperature'),
+        validateInput('hardness', v => v >= 150 && v <= 400, 'err_hardness'),
+        validateInput('velocity', v => v >= 1 && v <= 5, 'err_velocity'),
+        validateInput('coeff_mod', v => v >= 0.5 && v <= 1.2, 'err_coeff_mod'),
+        validateInput('mismatch', v => v >= 0 && v <= 1, 'err_mismatch')
+      ];
+      if (!valid.every(v => v)) return;
+
+      const payload = {
+        N: parseFloat(document.getElementById('N').value),
+        rpm: parseFloat(document.getElementById('rpm').value),
+        pressure: parseFloat(document.getElementById('pressure').value),
+        valve_material: document.getElementById('valve_material').value,
+        insert_material: document.getElementById('insert_material').value,
+        coating: document.getElementById('coating').value,
+        diameter: parseFloat(document.getElementById('diameter').value),
+        lubrication_index: parseFloat(document.getElementById('lubrication_index').value),
+        seat_angle: parseFloat(document.getElementById('seat_angle').value),
+        insert_angle: parseFloat(document.getElementById('insert_angle').value),
+        duration: parseFloat(document.getElementById('duration').value),
+        face_width: parseFloat(document.getElementById('face_width').value),
+        temperature: parseFloat(document.getElementById('temperature').value),
+        hardness: parseFloat(document.getElementById('hardness').value),
+        velocity: parseFloat(document.getElementById('velocity').value),
+        coeff_mod: parseFloat(document.getElementById('coeff_mod').value),
+        mismatch: parseFloat(document.getElementById('mismatch').value)
+      };
+
+      fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(response => response.json())
+      .then(data => alert('Predicted Wear: ' + data.predicted_wear.toFixed(4)))
+      .catch(err => alert('Prediction failed. Check inputs or server.'));
+    }
+  </script>
+</body>
+</html>
